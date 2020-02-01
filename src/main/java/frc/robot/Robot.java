@@ -11,6 +11,7 @@ import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.DistanceSensor;
 import frc.robot.sensors.Limelight;
 import frc.robot.sensors.Pipeline;
+import frc.robot.subsystems.Drivebase;
 
 public class Robot extends TimedRobot {
 
@@ -20,17 +21,21 @@ public class Robot extends TimedRobot {
     public static final GenericHID.Hand right = GenericHID.Hand.kRight;
 
     public static Limelight camera = new Limelight(Pipeline.RETRO);
-    public static DistanceSensor dist = new DistanceSensor(Rev2mDistanceSensor.Port.kOnboard);
+    //public static DistanceSensor dist = new DistanceSensor(Rev2mDistanceSensor.Port.kOnboard);
     public static ColorSensor color = new ColorSensor(I2C.Port.kMXP);
+
+    public static Drivebase base = new Drivebase(1, 2, 3, 4);
 
     @Override
     public void robotInit() {
-        dist.initialize();
+        //dist.initialize();
+        base.initialize();
     }
 
     @Override
     public void autonomousInit() {
-        dist.initialize();
+        //dist.initialize();
+        base.reset();
     }
 
     @Override
@@ -40,17 +45,24 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        dist.initialize();
+        //dist.initialize();
+        base.reset();
     }
 
     @Override
     public void teleopPeriodic() {
         dashboard();
+        drive();
     }
 
     public void dashboard() {
         camera.dashboard();
-        dist.dashboard();
+        //dist.dashboard();
         color.dashboard();
+        base.dashboard();
+    }
+    
+    public void drive() {
+        base.arcadeDrive();
     }
 }
