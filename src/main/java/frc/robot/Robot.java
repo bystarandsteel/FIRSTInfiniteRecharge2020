@@ -11,6 +11,7 @@ import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.DistanceSensor;
 import frc.robot.sensors.Limelight;
 import frc.robot.sensors.Pipeline;
+import frc.robot.subsystems.BallHandler;
 import frc.robot.subsystems.Drivebase;
 
 public class Robot extends TimedRobot {
@@ -26,16 +27,19 @@ public class Robot extends TimedRobot {
 
     public static Drivebase base = new Drivebase(1, 2, 3, 4);
 
+    public static BallHandler handler = new BallHandler(5,7, 6);
+
     @Override
     public void robotInit() {
         //dist.initialize();
         base.initialize();
+        handler.initialize();
     }
 
     @Override
     public void autonomousInit() {
-        //dist.initialize();
         base.reset();
+        handler.reset();
     }
 
     @Override
@@ -45,14 +49,15 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopInit() {
-        //dist.initialize();
         base.reset();
+        handler.reset();
     }
 
     @Override
     public void teleopPeriodic() {
         dashboard();
         drive();
+        handler.run();
     }
 
     public void dashboard() {
@@ -60,6 +65,7 @@ public class Robot extends TimedRobot {
         //dist.dashboard();
         color.dashboard();
         base.dashboard();
+        handler.dashboard();
     }
     
     public void drive() {
