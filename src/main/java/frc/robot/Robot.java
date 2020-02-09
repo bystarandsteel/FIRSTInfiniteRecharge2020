@@ -12,6 +12,7 @@ import frc.robot.sensors.DistanceSensor;
 import frc.robot.sensors.Limelight;
 import frc.robot.sensors.Pipeline;
 import frc.robot.subsystems.BallHandler;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivebase;
 
 public class Robot extends TimedRobot {
@@ -27,13 +28,16 @@ public class Robot extends TimedRobot {
 
     public static Drivebase base = new Drivebase(1, 2, 3, 4);
 
-    public static BallHandler handler = new BallHandler(5,7, 6);
+    public static BallHandler handler = new BallHandler(5,7, 12);
+
+    public static Climber climber = new Climber(8, 11);
 
     @Override
     public void robotInit() {
         //dist.initialize();
         base.initialize();
         handler.initialize();
+        climber.initialize();
     }
 
     @Override
@@ -58,6 +62,7 @@ public class Robot extends TimedRobot {
         dashboard();
         drive();
         handler.run();
+        climber.run();
     }
 
     public void dashboard() {

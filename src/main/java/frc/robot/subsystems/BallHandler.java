@@ -13,8 +13,9 @@ public class BallHandler {
 
     TalonSRX spinner, hood, intakeRaiser;
 
-    private boolean intakeUp = true;
     private boolean hoodIn = true;
+
+    private boolean intakeUp = true;
 
     DigitalInput hoodSwitch = new DigitalInput(9);
 
@@ -34,44 +35,35 @@ public class BallHandler {
         intakeRaiser.setSelectedSensorPosition(0);
     }
 
-    public double spinnerEncoder() {
-        return spinner.getSelectedSensorPosition();
-    }
-
     public double intakeRaiserEncoder() {
         return intakeRaiser.getSelectedSensorPosition();
     }
 
     public void dashboard() {
-        SmartDashboard.putNumber("Spinner Encoder", spinnerEncoder());
         SmartDashboard.putNumber("intakeRaiser Encoder", intakeRaiserEncoder());
-        SmartDashboard.putBoolean("Intake Up?", intakeUp);
         SmartDashboard.putBoolean("Hood Switch", hoodSwitch.get());
+        SmartDashboard.putBoolean("Intake Up", intakeUp);
     }
 
     public void run() {
-        if (Robot.operator.getTriggerAxis(Robot.left) > 0.5) {
-            spinner.set(ControlMode.PercentOutput, 0.5);
+        if (Robot.operator.getTriggerAxis(Robot.left) > 0.5 && intakeUp) {
+            spinner.set(ControlMode.PercentOutput, 0.75);
+        } else if (Robot.operator.getTriggerAxis(Robot.left) > 0.5 && !intakeUp) {
+            spinner.set(ControlMode.PercentOutput, 0.3);
         } else if (Robot.operator.getTriggerAxis(Robot.right) > 0.5) {
-            spinner.set(ControlMode.PercentOutput, -0.5);
+            spinner.set(ControlMode.PercentOutput, -0.75);
         } else {
             spinner.set(ControlMode.PercentOutput, 0);
         }
 
-        /*if (Robot.operator.getAButtonReleased()) {
+        if (Robot.operator.getAButtonReleased()) {
             intakeUp = !intakeUp;
         }
 
-        if (intakeUp && intakeRaiserEncoder() < 1100) {
-            intakeRaiser.set(ControlMode.PercentOutput, 1);
-        } else if (!intakeUp && intakeRaiserEncoder() > 20){
-            intakeRaiser.set(ControlMode.Position, -1);
-        }*/
-
-        if (Robot.operator.getBumper(Robot.left)) {
-            intakeRaiser.set(ControlMode.PercentOutput, 1);
-        } else if (Robot.operator.getBumper(Robot.right)) {
-            intakeRaiser.set(ControlMode.PercentOutput, -1);
+        if (intakeUp && intakeRaiserEncoder() > 200) {
+            intakeRaiser.set(ControlMode.PercentOutput, 0.25);
+        } else if (!intakeUp && intakeRaiserEncoder() < 1000) {
+            intakeRaiser.set(ControlMode.PercentOutput, -0.25);
         } else {
             intakeRaiser.set(ControlMode.PercentOutput, 0);
         }
