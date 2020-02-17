@@ -2,11 +2,9 @@ package frc.robot;
 
 import com.revrobotics.Rev2mDistanceSensor;
 
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.I2C;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.*;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.DistanceSensor;
 import frc.robot.sensors.Limelight;
@@ -20,6 +18,8 @@ public class Robot extends TimedRobot {
     public static XboxController operator = new XboxController(1);
     public static final GenericHID.Hand left = GenericHID.Hand.kLeft;
     public static final GenericHID.Hand right = GenericHID.Hand.kRight;
+
+    public static PowerDistributionPanel pdp = new PowerDistributionPanel(62);
 
     public static Limelight camera = new Limelight(0);
     public static DistanceSensor dist = new DistanceSensor(Rev2mDistanceSensor.Port.kOnboard);
@@ -72,6 +72,11 @@ public class Robot extends TimedRobot {
         base.dashboard();
         handler.dashboard();
         climber.dashboard();
+
+        SmartDashboard.putNumber("Voltage", RobotController.getBatteryVoltage());
+        SmartDashboard.putBoolean("Browned Out", RobotController.isBrownedOut());
+        SmartDashboard.putNumber("Match Time", Timer.getMatchTime());
+        SmartDashboard.putBoolean("FMS Status", DriverStation.getInstance().isFMSAttached());
     }
     
     public void drive() {
