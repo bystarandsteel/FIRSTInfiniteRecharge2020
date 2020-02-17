@@ -3,53 +3,32 @@ package frc.robot.sensors;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+import frc.robot.Robot;
+
 public class Limelight {
 
-    public Limelight(Pipeline pipeline) {
-        int pipelineID;
-
-        switch (pipeline) {
-            case RETRO:
-                pipelineID = 0;
-                break;
-            case BALL:
-                pipelineID = 1;
-                break;
-            default:
-                throw new IllegalArgumentException();
-        }
-
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(pipelineID);
+    public Limelight(int pipeline) {
+        setPipeline(pipeline);
     }
 
-    public Pipeline getPipeline() {
-        int pipelineID = (int)NetworkTableInstance.getDefault().getTable("limelight").getEntry("getpipe").getDouble(-1);
-
-        switch (pipelineID) {
-            case 0:
-                return Pipeline.RETRO;
-            case 1:
-                return Pipeline.BALL;
-            default:
-                return Pipeline.INVALID;
+    public void setPipeline(int pipeline) {
+        if (pipeline < 0 || pipeline > 2) {
+            return;
+        } else {
+            NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(pipeline);
         }
     }
 
-    public void setPipeline(Pipeline pipeline) {
-        int pipelineID;
-
-        switch (pipeline) {
-            case RETRO:
-                pipelineID = 0;
-                break;
-            case BALL:
-                pipelineID = 1;
-                break;
-            default:
-                throw new IllegalArgumentException();
+    public void nextPipeline() {
+        if (getPipeline() != 2) {
+            setPipeline(getPipeline() + 1);
+        } else {
+            setPipeline(0);
         }
+    }
 
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(pipelineID);
+    public int getPipeline() {
+        return NetworkTableInstance.getDefault().getTable("limelight").getEntry("getpipe").getNumber(-1).intValue();
     }
 
     public double[] getValues() {
@@ -62,9 +41,16 @@ public class Limelight {
         return values;
     }
 
+    public void run() {
+        if (Robot.operator.getStartButtonReleased()) {
+            nextPipeline();
+        }
+    }
+
     public void dashboard() {
         SmartDashboard.putNumber("tv", getValues()[0]);
         SmartDashboard.putNumber("tx", getValues()[1]);
         SmartDashboard.putNumber("ta", getValues()[2]);
+        SmartDashboard.putNumber("Pipeline", getPipeline());
     }
 }

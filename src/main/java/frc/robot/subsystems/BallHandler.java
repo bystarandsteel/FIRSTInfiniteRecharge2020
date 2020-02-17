@@ -40,8 +40,9 @@ public class BallHandler {
     }
 
     public void dashboard() {
-        SmartDashboard.putNumber("intakeRaiser Encoder", intakeRaiserEncoder());
-        SmartDashboard.putBoolean("Hood Switch", hoodSwitch.get());
+        SmartDashboard.putNumber("Intake Encoder", intakeRaiserEncoder());
+        SmartDashboard.putBoolean("Hood Switch", !hoodSwitch.get());
+        SmartDashboard.putBoolean("Hood In", hoodIn);
         SmartDashboard.putBoolean("Intake Up", intakeUp);
     }
 
@@ -49,7 +50,7 @@ public class BallHandler {
         if (Robot.operator.getTriggerAxis(Robot.left) > 0.5 && intakeUp) {
             spinner.set(ControlMode.PercentOutput, 0.75);
         } else if (Robot.operator.getTriggerAxis(Robot.left) > 0.5 && !intakeUp) {
-            spinner.set(ControlMode.PercentOutput, 0.3);
+            spinner.set(ControlMode.PercentOutput, 0.4);
         } else if (Robot.operator.getTriggerAxis(Robot.right) > 0.5) {
             spinner.set(ControlMode.PercentOutput, -0.75);
         } else {
@@ -74,6 +75,8 @@ public class BallHandler {
 
         if (hoodIn && hoodSwitch.get()) {
             hood.set(ControlMode.PercentOutput, -0.25);
+        } else if (Robot.operator.getYButton()) {
+            hood.set(ControlMode.PercentOutput, 0.25);
         } else {
             hood.set(ControlMode.PercentOutput, 0);
         }

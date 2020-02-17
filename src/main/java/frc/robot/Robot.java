@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.DistanceSensor;
 import frc.robot.sensors.Limelight;
-import frc.robot.sensors.Pipeline;
 import frc.robot.subsystems.BallHandler;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivebase;
@@ -22,7 +21,7 @@ public class Robot extends TimedRobot {
     public static final GenericHID.Hand left = GenericHID.Hand.kLeft;
     public static final GenericHID.Hand right = GenericHID.Hand.kRight;
 
-    public static Limelight camera = new Limelight(Pipeline.RETRO);
+    public static Limelight camera = new Limelight(0);
     public static DistanceSensor dist = new DistanceSensor(Rev2mDistanceSensor.Port.kOnboard);
     public static ColorSensor color = new ColorSensor(I2C.Port.kMXP);
 
@@ -30,7 +29,7 @@ public class Robot extends TimedRobot {
 
     public static BallHandler handler = new BallHandler(5,7, 12);
 
-    public static Climber climber = new Climber(8, 11);
+    public static Climber climber = new Climber(8, 11, 0);
 
     @Override
     public void robotInit() {
@@ -63,6 +62,7 @@ public class Robot extends TimedRobot {
         drive();
         handler.run();
         climber.run();
+        camera.run();
     }
 
     public void dashboard() {
@@ -71,6 +71,7 @@ public class Robot extends TimedRobot {
         color.dashboard();
         base.dashboard();
         handler.dashboard();
+        climber.dashboard();
     }
     
     public void drive() {

@@ -32,6 +32,5 @@ public class DistanceSensor {
     public void dashboard() {
         SmartDashboard.putNumber("Distance (in)", getRange(Rev2mDistanceSensor.Unit.kInches));
         SmartDashboard.putNumber("Distance (mm)", getRange(Rev2mDistanceSensor.Unit.kMillimeters));
-        SmartDashboard.putNumber("Distance Timestamp", getTimestamp());
     }
 }
