@@ -77,7 +77,7 @@ public class Drivebase {
         double turn = 0;
 
         if (Math.abs(Robot.driver.getX(Robot.right)) > 0.05) {
-            turn = Robot.driver.getX(Robot.right) * 0.8s;
+            turn = Robot.driver.getX(Robot.right) * 0.8;
         }
 
         if (Math.abs(Robot.driver.getY(Robot.left)) > 0.05) {
