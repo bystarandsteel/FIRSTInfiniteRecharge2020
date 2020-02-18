@@ -37,10 +37,10 @@ public class Drivebase {
         rightOne.setIdleMode(CANSparkMax.IdleMode.kBrake);
         rightTwo.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-        leftOne.setOpenLoopRampRate(0.9);
-        leftTwo.setOpenLoopRampRate(0.9);
-        rightOne.setOpenLoopRampRate(0.9);
-        rightTwo.setOpenLoopRampRate(0.9);
+        leftOne.setOpenLoopRampRate(0.5);
+        leftTwo.setOpenLoopRampRate(0.5);
+        rightOne.setOpenLoopRampRate(0.5);
+        rightTwo.setOpenLoopRampRate(0.5);
 
         driveBall.setTolerance(0.1);
         turnBall.setTolerance(0.5);
@@ -77,7 +77,7 @@ public class Drivebase {
         double turn = 0;
 
         if (Math.abs(Robot.driver.getX(Robot.right)) > 0.05) {
-            turn = Robot.driver.getX(Robot.right) * 0.8;
+            turn = Robot.driver.getX(Robot.right) * 0.45;
         }
 
         if (Math.abs(Robot.driver.getY(Robot.left)) > 0.05) {
@@ -108,8 +108,5 @@ public class Drivebase {
     public void dashboard() {
         SmartDashboard.putNumber("Left Position", leftPosition());
         SmartDashboard.putNumber("Right Position", rightPosition());
-
-        SmartDashboard.putData("Drive Ball PID", driveBall);
-        SmartDashboard.putData("Turn Ball PID", turnBall);
     }
 }
