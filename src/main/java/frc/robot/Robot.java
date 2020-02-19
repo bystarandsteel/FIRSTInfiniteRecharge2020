@@ -31,6 +31,10 @@ public class Robot extends TimedRobot {
 
     public static Climber climber = new Climber(8, 11, 0);
 
+    public static boolean flipDrive = false;
+
+    public static boolean endAuto = false;
+
     @Override
     public void robotInit() {
         dist.initialize();
@@ -80,8 +84,14 @@ public class Robot extends TimedRobot {
     }
     
     public void drive() {
-        if (driver.getAButton()) {
-            base.ballSeek();
+        if (driver.getBumper(right)) {
+            flipDrive = true;
+        } else {
+            flipDrive = false;
+        }
+
+        if (driver.getTriggerAxis(right) > 0.5) {
+            base.tankDrive();
         } else {
             base.arcadeDrive();
         }

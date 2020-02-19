@@ -13,7 +13,7 @@ public class BallHandler {
 
     TalonSRX spinner, hood, intakeRaiser;
 
-    private boolean hoodIn = true;
+    private boolean hoodIn = false;
 
     private boolean intakeUp = true;
 
@@ -39,6 +39,20 @@ public class BallHandler {
         return intakeRaiser.getSelectedSensorPosition();
     }
 
+    public void releaseHood() {
+        hood.set(ControlMode.PercentOutput, 0.25);
+    }
+
+    public void spitOut() {
+        spinner.set(ControlMode.PercentOutput, 0.75);
+    }
+
+    public void stop() {
+        spinner.set(ControlMode.PercentOutput, 0);
+        hood.set(ControlMode.PercentOutput, 0);
+        intakeRaiser.set(ControlMode.PercentOutput, 0);
+    }
+
     public void dashboard() {
         SmartDashboard.putNumber("Intake Encoder", intakeRaiserEncoder());
         SmartDashboard.putBoolean("Hood Switch", !hoodSwitch.get());
@@ -49,6 +63,8 @@ public class BallHandler {
     public void run() {
         if (Robot.operator.getTriggerAxis(Robot.left) > 0.5 && intakeUp) {
             spinner.set(ControlMode.PercentOutput, 0.75);
+        } else if (Robot.operator.getBumper(Robot.left)) {
+            spinner.set(ControlMode.PercentOutput, 0.3);
         } else if (Robot.operator.getTriggerAxis(Robot.left) > 0.5 && !intakeUp) {
             spinner.set(ControlMode.PercentOutput, 0.4);
         } else if (Robot.operator.getTriggerAxis(Robot.right) > 0.5) {

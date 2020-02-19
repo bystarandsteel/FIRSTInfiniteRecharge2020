@@ -20,9 +20,7 @@ public class Drivebase {
     private static final double turnI = 0.0;
     private static final double turnD = 0.0;
 
-    private PIDController driveBall = new PIDController(driveP, driveI, driveD);
-
-    private PIDController turnBall = new PIDController(turnP, turnI, turnD);
+    private static PIDController driveController = new PIDController(driveP, driveI, driveD);
 
     public Drivebase(int leftOneID, int leftTwoID, int rightOneID, int rightTwoID) {
         leftOne = new CANSparkMax(leftOneID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -37,16 +35,13 @@ public class Drivebase {
         rightOne.setIdleMode(CANSparkMax.IdleMode.kBrake);
         rightTwo.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-        leftOne.setOpenLoopRampRate(0.5);
-        leftTwo.setOpenLoopRampRate(0.5);
-        rightOne.setOpenLoopRampRate(0.5);
-        rightTwo.setOpenLoopRampRate(0.5);
+        leftOne.setOpenLoopRampRate(0.7);
+        leftTwo.setOpenLoopRampRate(0.7);
+        rightOne.setOpenLoopRampRate(0.7);
+        rightTwo.setOpenLoopRampRate(0.7);
 
-        driveBall.setTolerance(0.1);
-        turnBall.setTolerance(0.5);
-
-        driveBall.setSetpoint(1);
-        turnBall.setSetpoint(0);
+        driveController.setTolerance(0.05);
+        driveController.setSetpoint(0);
     }
 
     public void reset() {
@@ -62,14 +57,6 @@ public class Drivebase {
 
     public double rightPosition() {
         return rightOne.getEncoder().getPosition();
-    }
-
-    public double leftVelocity() {
-        return leftOne.getEncoder().getVelocity();
-    }
-
-    public double rightVelocity() {
-        return rightOne.getEncoder().getVelocity();
     }
 
     public void arcadeDrive() {
@@ -89,20 +76,59 @@ public class Drivebase {
             throttle *= 0.2;
         }
 
-        leftOne.set(turn - throttle);
-        leftTwo.set(turn - throttle);
-        rightOne.set(turn + throttle);
-        rightTwo.set(turn + throttle);
+        if (Robot.flipDrive) {
+            leftOne.set(turn + throttle);
+            leftTwo.set(turn + throttle);
+            rightOne.set(turn - throttle);
+            rightTwo.set(turn - throttle);
+        } else {
+            leftOne.set(turn - throttle);
+            leftTwo.set(turn - throttle);
+            rightOne.set(turn + throttle);
+            rightTwo.set(turn + throttle);
+        }
     }
 
-    public void ballSeek() {
-        double throttle = -driveBall.calculate(Robot.camera.getValues()[2]);
-        double turn = -turnBall.calculate(Robot.camera.getValues()[1]);
+    public void tankDrive() {
+        if (Robot.flipDrive) {
+            leftOne.set(Robot.driver.getY(Robot.left));
+            leftTwo.set(Robot.driver.getY(Robot.left));
+            rightOne.set(-Robot.driver.getY(Robot.right));
+            rightTwo.set(-Robot.driver.getY(Robot.right));
+        } else {
+            leftOne.set(-Robot.driver.getY(Robot.left));
+            leftTwo.set(-Robot.driver.getY(Robot.left));
+            rightOne.set(Robot.driver.getY(Robot.right));
+            rightTwo.set(Robot.driver.getY(Robot.right));
+        }
+    }
 
-        leftOne.set(turn - throttle);
-        leftTwo.set(turn - throttle);
-        rightOne.set(turn + throttle);
-        rightTwo.set(turn + throttle);
+    public void setSetpoint(double setpoint) {
+        driveController.setSetpoint(setpoint);
+    }
+
+    public boolean atSetpoint() {
+        return driveController.atSetpoint();
+    }
+
+    public double getSetpoint() {
+        return driveController.getSetpoint();
+    }
+
+    public void driveToTarget() {
+        double speed = driveController.calculate(leftPosition());
+
+        leftOne.set(speed);
+        leftTwo.set(speed);
+        rightOne.set(-speed);
+        rightTwo.set(-speed);
+    }
+
+    public void stop() {
+        leftOne.set(0);
+        leftTwo.set(0);
+        rightOne.set(0);
+        rightTwo.set(0);
     }
 
     public void dashboard() {
