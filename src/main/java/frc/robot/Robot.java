@@ -3,8 +3,13 @@ package frc.robot;
 import com.revrobotics.Rev2mDistanceSensor;
 
 import edu.wpi.first.wpilibj.*;
-
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import frc.robot.routines.Back;
+import frc.robot.routines.Nothing;
+import frc.robot.routines.Routine;
+import frc.robot.routines.Score;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.DistanceSensor;
 import frc.robot.sensors.Limelight;
@@ -18,8 +23,6 @@ public class Robot extends TimedRobot {
     public static XboxController operator = new XboxController(1);
     public static final GenericHID.Hand left = GenericHID.Hand.kLeft;
     public static final GenericHID.Hand right = GenericHID.Hand.kRight;
-
-    public static PowerDistributionPanel pdp = new PowerDistributionPanel(62);
 
     public static Limelight camera = new Limelight(0);
     public static DistanceSensor dist = new DistanceSensor(Rev2mDistanceSensor.Port.kOnboard);
@@ -35,18 +38,33 @@ public class Robot extends TimedRobot {
 
     public static boolean endAuto = false;
 
+    SendableChooser<Routine> chooser = new SendableChooser<>();
+
     @Override
     public void robotInit() {
         dist.initialize();
         base.initialize();
         handler.initialize();
         climber.initialize();
+
+        chooser.setDefaultOption("Disable Auto", new Nothing());
+        chooser.addOption("Score", new Score());
+        chooser.addOption("Back Up", new Back());
+        SmartDashboard.putData("Auto Mode", chooser);
+    }
+
+    @Override
+    public void robotPeriodic() {
+        dashboard();
     }
 
     @Override
     public void autonomousInit() {
         base.reset();
         handler.reset();
+
+        Routine autoRoutine = chooser.getSelected();
+        autoRoutine.run();
     }
 
     @Override
@@ -58,11 +76,12 @@ public class Robot extends TimedRobot {
     public void teleopInit() {
         base.reset();
         handler.reset();
+
+        endAuto = true;
     }
 
     @Override
     public void teleopPeriodic() {
-        dashboard();
         drive();
         handler.run();
         climber.run();

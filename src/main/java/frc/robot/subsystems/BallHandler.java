@@ -54,10 +54,8 @@ public class BallHandler {
     }
 
     public void dashboard() {
-        SmartDashboard.putNumber("Intake Encoder", intakeRaiserEncoder());
         SmartDashboard.putBoolean("Hood Switch", !hoodSwitch.get());
         SmartDashboard.putBoolean("Hood In", hoodIn);
-        SmartDashboard.putBoolean("Intake Up", intakeUp);
     }
 
     public void run() {

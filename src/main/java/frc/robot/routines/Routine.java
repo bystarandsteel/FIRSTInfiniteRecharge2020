@@ -1,6 +1,6 @@
 package frc.robot.routines;
 
-public interface Routines {
+public interface Routine {
 
     void run();
     int status();
