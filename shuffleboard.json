@@ -56,7 +56,7 @@
               "_title": "Left Position"
             }
           },
-          "0,0": {
+          "3,0": {
             "size": [
               1,
               1
@@ -91,7 +91,7 @@
               "_title": "Blue"
             }
           },
-          "3,0": {
+          "4,0": {
             "size": [
               1,
               1
@@ -148,19 +148,6 @@
               "_title": "Distance (mm)"
             }
           },
-          "1,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Boolean Box",
-              "_source0": "network_table:///SmartDashboard/Intake Up",
-              "_title": "Intake Up",
-              "Colors/Color when true": "#7CFC00FF",
-              "Colors/Color when false": "#8B0000FF"
-            }
-          },
           "3,1": {
             "size": [
               1,
@@ -170,17 +157,6 @@
               "_type": "Text View",
               "_source0": "network_table:///SmartDashboard/Distance (in)",
               "_title": "Distance (in)"
-            }
-          },
-          "4,0": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Intake Encoder",
-              "_title": "Intake Encoder"
             }
           },
           "8,0": {
@@ -280,23 +256,26 @@
               "_title": "limelight_Interface"
             }
           },
-          "0,1": {
+          "0,0": {
             "size": [
-              3,
-              3
+              2,
+              1
             ],
             "content": {
-              "_type": "Camera Stream",
-              "_source0": "camera_server://limelight",
-              "_title": "limelight",
-              "Crosshair/Show crosshair": false,
-              "Crosshair/Crosshair color": "#FFFFFFFF",
-              "Controls/Show controls": false,
-              "Controls/Rotation": "NONE",
-              "compression": 100.0,
-              "fps": -1,
-              "imageWidth": 0,
-              "imageHeight": 0
+              "_type": "ComboBox Chooser",
+              "_source0": "network_table:///SmartDashboard/Auto Mode",
+              "_title": "Auto Mode"
+            }
+          },
+          "0,1": {
+            "size": [
+              1,
+              2
+            ],
+            "content": {
+              "_type": "PID Controller",
+              "_source0": "network_table:///SmartDashboard/PID",
+              "_title": "PID"
             }
           }
         }

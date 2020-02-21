@@ -12,7 +12,7 @@ public class Drivebase {
 
     CANSparkMax leftOne, leftTwo, rightOne, rightTwo;
 
-    private static final double driveP = 0.08;
+    private static final double driveP = 0.01;
     private static final double driveI = 0.0;
     private static final double driveD = 0.0;
 
@@ -134,5 +134,6 @@ public class Drivebase {
     public void dashboard() {
         SmartDashboard.putNumber("Left Position", leftPosition());
         SmartDashboard.putNumber("Right Position", rightPosition());
+        SmartDashboard.putData("PID", driveController);
     }
 }

@@ -38,6 +38,6 @@ public class DriveDistance implements Procedure {
 
     @Override
     public boolean complete() {
-        return false;
+        return complete;
     }
 }

@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import frc.robot.routines.Back;
-import frc.robot.routines.Nothing;
-import frc.robot.routines.Routine;
-import frc.robot.routines.Score;
+import frc.robot.Autos.Auto;
+import frc.robot.procedures.DriveDistance;
+import frc.robot.procedures.Procedure;
+import frc.robot.procedures.SpitBalls;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.DistanceSensor;
 import frc.robot.sensors.Limelight;
@@ -38,7 +38,16 @@ public class Robot extends TimedRobot {
 
     public static boolean endAuto = false;
 
-    SendableChooser<Routine> chooser = new SendableChooser<>();
+    public static SendableChooser<Auto> chooser = new SendableChooser<>();
+
+    public static Procedure[] scoreArray = {new DriveDistance(), new SpitBalls(), new DriveDistance()};
+    public static double[] paramsScore = {0, 0, 0};
+
+    public static Procedure[] backArray = {new DriveDistance()};
+    public static double[] paramsBack = {0};
+
+    public static Auto score = new Auto(scoreArray, paramsScore);
+    public static Auto back = new Auto(backArray, paramsBack);
 
     @Override
     public void robotInit() {
@@ -47,9 +56,9 @@ public class Robot extends TimedRobot {
         handler.initialize();
         climber.initialize();
 
-        chooser.setDefaultOption("Disable Auto", new Nothing());
-        chooser.addOption("Score", new Score());
-        chooser.addOption("Back Up", new Back());
+        chooser.setDefaultOption("Disable Auto", null);
+        chooser.addOption("Score", score);
+        chooser.addOption("Back Up", back);
         SmartDashboard.putData("Auto Mode", chooser);
     }
 
@@ -63,13 +72,18 @@ public class Robot extends TimedRobot {
         base.reset();
         handler.reset();
 
-        Routine autoRoutine = chooser.getSelected();
-        autoRoutine.run();
+        Auto autoAction = chooser.getSelected();
+
+        if (autoAction != null) {
+            for (int i = 0; i < autoAction.getProcedures().length; i++) {
+                autoAction.getProcedures()[i].run(autoAction.getParams()[i]);
+            }
+        }
     }
 
     @Override
     public void autonomousPeriodic() {
-        dashboard();
+
     }
 
     @Override
@@ -111,6 +125,8 @@ public class Robot extends TimedRobot {
 
         if (driver.getTriggerAxis(right) > 0.5) {
             base.tankDrive();
+        } else if (driver.getAButton()) {
+            base.driveToTarget();
         } else {
             base.arcadeDrive();
         }
