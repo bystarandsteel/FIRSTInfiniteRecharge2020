@@ -6,13 +6,10 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-import frc.robot.Autos.Auto;
-import frc.robot.procedures.DriveDistance;
-import frc.robot.procedures.Procedure;
-import frc.robot.procedures.SpitBalls;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.DistanceSensor;
 import frc.robot.sensors.Limelight;
+import frc.robot.sensors.NavX;
 import frc.robot.subsystems.BallHandler;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivebase;
@@ -27,27 +24,17 @@ public class Robot extends TimedRobot {
     public static Limelight camera = new Limelight(0);
     public static DistanceSensor dist = new DistanceSensor(Rev2mDistanceSensor.Port.kOnboard);
     public static ColorSensor color = new ColorSensor(I2C.Port.kMXP);
+    public static NavX gyro = new NavX();
 
     public static Drivebase base = new Drivebase(1, 2, 3, 4);
-
     public static BallHandler handler = new BallHandler(5,7, 12);
-
     public static Climber climber = new Climber(8, 11, 0);
 
     public static boolean flipDrive = false;
 
-    public static boolean endAuto = false;
+    public static SendableChooser<Integer> chooser = new SendableChooser<>();
 
-    public static SendableChooser<Auto> chooser = new SendableChooser<>();
-
-    public static Procedure[] scoreArray = {new DriveDistance(), new SpitBalls(), new DriveDistance()};
-    public static double[] paramsScore = {0, 0, 0};
-
-    public static Procedure[] backArray = {new DriveDistance()};
-    public static double[] paramsBack = {0};
-
-    public static Auto score = new Auto(scoreArray, paramsScore);
-    public static Auto back = new Auto(backArray, paramsBack);
+    public static int autoCounter = 0;
 
     @Override
     public void robotInit() {
@@ -56,9 +43,9 @@ public class Robot extends TimedRobot {
         handler.initialize();
         climber.initialize();
 
-        chooser.setDefaultOption("Disable Auto", null);
-        chooser.addOption("Score", score);
-        chooser.addOption("Back Up", back);
+        chooser.setDefaultOption("Disable Auto", 0);
+        chooser.addOption("Score", 1);
+        chooser.addOption("Back Up", 2);
         SmartDashboard.putData("Auto Mode", chooser);
     }
 
@@ -71,27 +58,52 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         base.reset();
         handler.reset();
-
-        Auto autoAction = chooser.getSelected();
-
-        if (autoAction != null) {
-            for (int i = 0; i < autoAction.getProcedures().length; i++) {
-                autoAction.getProcedures()[i].run(autoAction.getParams()[i]);
-            }
-        }
     }
 
     @Override
     public void autonomousPeriodic() {
-
+        switch (chooser.getSelected()) {
+            case 1:
+                if (autoCounter == 0) {
+                    base.setSetpoint(51);
+                }
+                if (!base.atSetpoint()) {
+                    base.driveToTarget();
+                } else {
+                    base.stop();
+                    if (autoCounter < 95) {
+                        handler.spitOut();
+                        autoCounter++;
+                    } else {
+                        handler.stop();
+                        base.setSetpoint(20);
+                        if (!base.atSetpoint()) {
+                            base.driveToTarget();
+                        } else {
+                            base.stop();
+                            handler.hoodIn();
+                        }
+                    }
+                }
+                break;
+            case 2:
+                base.setSetpoint(-10);
+                if (!base.atSetpoint()) {
+                    base.driveToTarget();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     public void teleopInit() {
+        base.stop();
+        handler.stop();
+
         base.reset();
         handler.reset();
-
-        endAuto = true;
     }
 
     @Override
@@ -109,6 +121,7 @@ public class Robot extends TimedRobot {
         base.dashboard();
         handler.dashboard();
         climber.dashboard();
+        gyro.dashboard();
 
         SmartDashboard.putNumber("Voltage", RobotController.getBatteryVoltage());
         SmartDashboard.putBoolean("Browned Out", RobotController.isBrownedOut());

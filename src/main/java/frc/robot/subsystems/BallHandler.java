@@ -26,6 +26,8 @@ public class BallHandler {
     }
 
     public void initialize() {
+        reset();
+
         spinner.setNeutralMode(NeutralMode.Brake);
         hood.setNeutralMode(NeutralMode.Brake);
         intakeRaiser.setNeutralMode(NeutralMode.Coast);
@@ -47,6 +49,20 @@ public class BallHandler {
         spinner.set(ControlMode.PercentOutput, 0.75);
     }
 
+    public void hoodIn() {
+        hoodIn = true;
+
+        if (hoodSwitch.get()) {
+            hood.set(ControlMode.PercentOutput, -0.25);
+        } else {
+            hood.set(ControlMode.PercentOutput, 0);
+        }
+
+        if (hoodIn && !hoodSwitch.get()) {
+            hood.setNeutralMode(NeutralMode.Brake);
+        }
+    }
+
     public void stop() {
         spinner.set(ControlMode.PercentOutput, 0);
         hood.set(ControlMode.PercentOutput, 0);
@@ -59,14 +75,12 @@ public class BallHandler {
     }
 
     public void run() {
-        if (Robot.operator.getTriggerAxis(Robot.left) > 0.5 && intakeUp) {
-            spinner.set(ControlMode.PercentOutput, 0.75);
+        if (Robot.operator.getTriggerAxis(Robot.left) > 0.5) {
+            spinner.set(ControlMode.PercentOutput, 0.8);
         } else if (Robot.operator.getBumper(Robot.left)) {
             spinner.set(ControlMode.PercentOutput, 0.3);
-        } else if (Robot.operator.getTriggerAxis(Robot.left) > 0.5 && !intakeUp) {
-            spinner.set(ControlMode.PercentOutput, 0.4);
         } else if (Robot.operator.getTriggerAxis(Robot.right) > 0.5) {
-            spinner.set(ControlMode.PercentOutput, -0.75);
+            spinner.set(ControlMode.PercentOutput, -0.8);
         } else {
             spinner.set(ControlMode.PercentOutput, 0);
         }

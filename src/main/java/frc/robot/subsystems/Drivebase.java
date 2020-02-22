@@ -12,7 +12,7 @@ public class Drivebase {
 
     CANSparkMax leftOne, leftTwo, rightOne, rightTwo;
 
-    private static final double driveP = 0.01;
+    private static final double driveP = 0.015;
     private static final double driveI = 0.0;
     private static final double driveD = 0.0;
 
@@ -30,6 +30,8 @@ public class Drivebase {
     }
 
     public void initialize() {
+        reset();
+
         leftOne.setIdleMode(CANSparkMax.IdleMode.kBrake);
         leftTwo.setIdleMode(CANSparkMax.IdleMode.kBrake);
         rightOne.setIdleMode(CANSparkMax.IdleMode.kBrake);
@@ -40,7 +42,7 @@ public class Drivebase {
         rightOne.setOpenLoopRampRate(0.7);
         rightTwo.setOpenLoopRampRate(0.7);
 
-        driveController.setTolerance(0.05);
+        driveController.setTolerance(1.5);
         driveController.setSetpoint(0);
     }
 
@@ -108,7 +110,11 @@ public class Drivebase {
     }
 
     public boolean atSetpoint() {
-        return driveController.atSetpoint();
+        if (Math.abs(getSetpoint() - leftPosition()) < 1) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public double getSetpoint() {

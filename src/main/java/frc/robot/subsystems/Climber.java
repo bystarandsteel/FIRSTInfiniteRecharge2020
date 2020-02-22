@@ -37,7 +37,7 @@ public class Climber {
         }
 
         if (rachetEngaged) {
-            rachet.setPosition(0.5);
+            rachet.setPosition(0.6);
         } else {
             rachet.setPosition(0.1);
         }
