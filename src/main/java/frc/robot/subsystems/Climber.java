@@ -4,15 +4,22 @@ import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import frc.robot.Robot;
 
 public class Climber {
 
-    TalonSRX climber, roller;
+    private TalonSRX climber, roller;
 
-    Servo rachet;
+    private Servo rachet;
+
+    private static final double levelerP = 0.1;
+    private static final double levelerI = 0;
+    private static final double levelerD = 0;
+
+    PIDController leveler = new PIDController(levelerP, levelerI, levelerD);
 
     boolean rachetEngaged = false;
 
@@ -28,6 +35,9 @@ public class Climber {
         roller.setNeutralMode(NeutralMode.Brake);
 
         rachet.setPosition(0.1);
+
+        leveler.setSetpoint(3.5);
+        leveler.setTolerance(4);
     }
 
     public void run() {
@@ -53,6 +63,8 @@ public class Climber {
             roller.set(ControlMode.PercentOutput, -0.4);
         } else if (Robot.operator.getX(Robot.right) < -0.5) {
             roller.set(ControlMode.PercentOutput, 0.4);
+        } else if (Robot.operator.getBumper(Robot.right)) {
+            roller.set(ControlMode.PercentOutput, leveler.calculate(Robot.imu.getAngle()));
         } else {
             roller.set(ControlMode.PercentOutput, 0);
         }

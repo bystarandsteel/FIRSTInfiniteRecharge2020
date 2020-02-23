@@ -9,7 +9,7 @@ import frc.robot.Robot;
 
 public class Drivebase {
 
-    CANSparkMax leftOne, leftTwo, rightOne, rightTwo;
+    private CANSparkMax leftOne, leftTwo, rightOne, rightTwo;
 
     private static final double driveP = 0.015;
     private static final double driveI = 0.0;
@@ -19,7 +19,7 @@ public class Drivebase {
     private static final double turnI = 0.0;
     private static final double turnD = 0.0;
 
-    private static PIDController driveController = new PIDController(driveP, driveI, driveD);
+    private PIDController driveController = new PIDController(driveP, driveI, driveD);
 
     public Drivebase(int leftOneID, int leftTwoID, int rightOneID, int rightTwoID) {
         leftOne = new CANSparkMax(leftOneID, CANSparkMaxLowLevel.MotorType.kBrushless);

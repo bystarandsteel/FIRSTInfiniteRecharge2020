@@ -10,13 +10,13 @@ import frc.robot.Robot;
 
 public class BallHandler {
 
-    TalonSRX spinner, hood, intakeRaiser;
+    private TalonSRX spinner, hood, intakeRaiser;
 
     private boolean hoodIn = false;
 
     private boolean intakeUp = true;
 
-    DigitalInput hoodSwitch = new DigitalInput(9);
+    private DigitalInput hoodSwitch = new DigitalInput(9);
 
     public BallHandler(int spinnerID, int hoodID, int intakeRaiserID) {
         spinner = new TalonSRX(spinnerID);
