@@ -137,17 +137,6 @@
               "_title": "tx"
             }
           },
-          "4,1": {
-            "size": [
-              1,
-              1
-            ],
-            "content": {
-              "_type": "Text View",
-              "_source0": "network_table:///SmartDashboard/Distance (mm)",
-              "_title": "Distance (mm)"
-            }
-          },
           "3,1": {
             "size": [
               1,
@@ -267,15 +256,15 @@
               "_title": "Auto Mode"
             }
           },
-          "0,1": {
+          "4,1": {
             "size": [
               1,
-              2
+              1
             ],
             "content": {
-              "_type": "PID Controller",
-              "_source0": "network_table:///SmartDashboard/PID",
-              "_title": "PID"
+              "_type": "Text View",
+              "_source0": "network_table:///SmartDashboard/Angle",
+              "_title": "Angle"
             }
           }
         }
@@ -329,6 +318,15 @@
                   "_source0": "network_table:///LiveWindow/Ungrouped/PowerDistributionPanel[62]",
                   "_title": "PowerDistributionPanel[62]",
                   "Visuals/Show voltage and current values": true
+                },
+                {
+                  "_type": "Gyro",
+                  "_source0": "network_table:///LiveWindow/Ungrouped/navX-Sensor",
+                  "_title": "/LiveWindow/Ungrouped/navX-Sensor",
+                  "Visuals/Major tick spacing": 45.0,
+                  "Visuals/Starting angle": 180.0,
+                  "Visuals/Show tick mark ring": true,
+                  "Visuals/Counter clockwise": false
                 }
               ]
             }
