@@ -3,16 +3,10 @@ package frc.robot;
 import com.revrobotics.Rev2mDistanceSensor;
 
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.*;
 
-import frc.robot.sensors.ColorSensor;
-import frc.robot.sensors.DistanceSensor;
-import frc.robot.sensors.Limelight;
-import frc.robot.sensors.NavX;
-import frc.robot.subsystems.BallHandler;
-import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.Drivebase;
+import frc.robot.sensors.*;
+import frc.robot.subsystems.*;
 
 public class Robot extends TimedRobot {
 
@@ -25,6 +19,7 @@ public class Robot extends TimedRobot {
     public static DistanceSensor dist = new DistanceSensor(Rev2mDistanceSensor.Port.kOnboard);
     public static ColorSensor color = new ColorSensor(I2C.Port.kMXP);
     public static NavX gyro = new NavX();
+    public static IMU imu = new IMU();
 
     public static Drivebase base = new Drivebase(1, 2, 3, 4);
     public static BallHandler handler = new BallHandler(5,7, 12);
@@ -112,6 +107,7 @@ public class Robot extends TimedRobot {
         handler.run();
         climber.run();
         camera.run();
+        imu.run();
     }
 
     public void dashboard() {
@@ -122,6 +118,7 @@ public class Robot extends TimedRobot {
         handler.dashboard();
         climber.dashboard();
         gyro.dashboard();
+        imu.dashboard();
 
         SmartDashboard.putNumber("Voltage", RobotController.getBatteryVoltage());
         SmartDashboard.putBoolean("Browned Out", RobotController.isBrownedOut());
