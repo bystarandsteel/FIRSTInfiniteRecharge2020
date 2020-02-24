@@ -40,7 +40,8 @@ public class Robot extends TimedRobot {
 
         chooser.setDefaultOption("Disable Auto", 0);
         chooser.addOption("Score", 1);
-        chooser.addOption("Back Up", 2);
+        chooser.addOption("Score and Side", 2);
+        chooser.addOption("Back Up", 3);
         SmartDashboard.putData("Auto Mode", chooser);
     }
 
@@ -60,10 +61,10 @@ public class Robot extends TimedRobot {
         switch (chooser.getSelected()) {
             case 1:
                 if (autoCounter == 0) {
-                    base.setSetpoint(51);
+                    base.setSetpointEncoder(51);
                 }
-                if (!base.atSetpoint()) {
-                    base.driveToTarget();
+                if (!base.atSetpointEncoder()) {
+                    base.driveToEncoder();
                 } else {
                     base.stop();
                     if (autoCounter < 95) {
@@ -71,20 +72,83 @@ public class Robot extends TimedRobot {
                         autoCounter++;
                     } else {
                         handler.stop();
-                        base.setSetpoint(20);
-                        if (!base.atSetpoint()) {
-                            base.driveToTarget();
+                        base.setSetpointEncoder(20);
+                        if (!base.atSetpointEncoder()) {
+                            base.driveToEncoder();
                         } else {
                             base.stop();
                             handler.hoodIn();
+                            base.setSetpointGyro(180);
+                            if (!base.atSetpointGyro()) {
+                                base.turnToGyro();
+                            } else {
+                                base.stop();
+                                base.ballSeek();
+                            }
                         }
                     }
                 }
                 break;
             case 2:
-                base.setSetpoint(-10);
-                if (!base.atSetpoint()) {
-                    base.driveToTarget();
+                if (autoCounter == 0) {
+                    base.setSetpointEncoder(51);
+                }
+                if (!base.atSetpointEncoder()) {
+                    base.driveToEncoder();
+                } else {
+                    base.stop();
+                    if (autoCounter < 95 && autoCounter >= 0) {
+                        handler.spitOut();
+                        autoCounter++;
+                    } else {
+                        handler.stop();
+                        base.setSetpointEncoder(35);
+                        if (!base.atSetpointEncoder()) {
+                            base.driveToEncoder();
+                        } else {
+                            base.stop();
+                            handler.hoodIn();
+                            if (autoCounter > -1) {
+                                base.setSetpointGyro(270);
+                            }
+                            if (!base.atSetpointGyro()) {
+                                base.turnToGyro();
+                                autoCounter = -1;
+                            } else {
+                                base.stop();
+                                if (autoCounter == -1) {
+                                    base.reset();
+                                }
+                                if (!base.atSetpointEncoder()) {
+                                    base.driveToEncoder();
+                                    autoCounter--;
+                                } else {
+                                    base.setSetpointGyro(180);
+                                    if (!base.atSetpointGyro()) {
+                                        base.turnToGyro();
+                                    } else {
+                                        base.stop();
+                                        base.ballSeek();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case 3:
+                base.setSetpointEncoder(-5);
+                if (!base.atSetpointEncoder()) {
+                    base.driveToEncoder();
+                } else {
+                    base.stop();
+                    base.setSetpointGyro(180);
+                    if (!base.atSetpointGyro()) {
+                        base.turnToGyro();
+                    } else {
+                        base.stop();
+                        base.ballSeek();
+                    }
                 }
                 break;
             default:
@@ -136,7 +200,7 @@ public class Robot extends TimedRobot {
         if (driver.getTriggerAxis(right) > 0.5) {
             base.tankDrive();
         } else if (driver.getAButton()) {
-            base.driveToTarget();
+            base.driveToEncoder();
         } else {
             base.arcadeDrive();
         }

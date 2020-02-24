@@ -19,7 +19,13 @@ public class Drivebase {
     private static final double turnI = 0.0;
     private static final double turnD = 0.0;
 
-    private PIDController driveController = new PIDController(driveP, driveI, driveD);
+    private PIDController driveEncoderController = new PIDController(driveP, driveI, driveD);
+    private PIDController driveDistanceController = new PIDController(driveP, driveI, driveD);
+
+    private PIDController turnGyroController = new PIDController(turnP, turnI, turnD);
+
+    private PIDController driveBallController = new PIDController(driveP, driveI, driveD);
+    private PIDController turnBallController = new PIDController(turnP, turnI, turnD);
 
     public Drivebase(int leftOneID, int leftTwoID, int rightOneID, int rightTwoID) {
         leftOne = new CANSparkMax(leftOneID, CANSparkMaxLowLevel.MotorType.kBrushless);
@@ -41,8 +47,20 @@ public class Drivebase {
         rightOne.setOpenLoopRampRate(0.7);
         rightTwo.setOpenLoopRampRate(0.7);
 
-        driveController.setTolerance(1.5);
-        driveController.setSetpoint(0);
+        driveEncoderController.setTolerance(1.5);
+        driveEncoderController.setSetpoint(0);
+
+        driveEncoderController.setTolerance(0.25);
+        driveEncoderController.setSetpoint(6);
+
+        turnGyroController.setTolerance(2);
+        turnGyroController.setSetpoint(0);
+
+        driveBallController.setTolerance(0.5);
+        driveBallController.setSetpoint(6);
+
+        turnBallController.setTolerance(1);
+        turnBallController.setSetpoint(0);
     }
 
     public void reset() {
@@ -104,29 +122,89 @@ public class Drivebase {
         }
     }
 
-    public void setSetpoint(double setpoint) {
-        driveController.setSetpoint(setpoint);
+    public void setSetpointEncoder(double setpoint) {
+        driveEncoderController.setSetpoint(setpoint);
     }
 
-    public boolean atSetpoint() {
-        if (Math.abs(getSetpoint() - leftPosition()) < 1) {
+    public void setSetpointDistance(double setpoint) {
+        driveDistanceController.setSetpoint(setpoint);
+    }
+
+    public void setSetpointGyro(double setpoint) {
+        turnGyroController.setSetpoint(setpoint);
+    }
+
+    public boolean atSetpointEncoder() {
+        if (Math.abs(getSetpointEncoder() - leftPosition()) < 1) {
             return true;
         } else {
             return false;
         }
     }
 
-    public double getSetpoint() {
-        return driveController.getSetpoint();
+    public boolean atSetpointDistance() {
+        if (Math.abs(getSetpointDistance() - Robot.dist.getRange(Rev2mDistanceSensor.Unit.kInches)) < 0.25) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
-    public void driveToTarget() {
-        double speed = driveController.calculate(leftPosition());
+    public boolean atSetpointGyro() {
+        if (Math.abs(getSetpointGyro() - Robot.gyro.getAngle()) < 2) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public double getSetpointEncoder() {
+        return driveEncoderController.getSetpoint();
+    }
+
+    public double getSetpointDistance() {
+        return driveDistanceController.getSetpoint();
+    }
+
+    public double getSetpointGyro() {
+        return turnGyroController.getSetpoint();
+    }
+
+    public void driveToEncoder() {
+        double speed = driveEncoderController.calculate(leftPosition());
 
         leftOne.set(speed);
         leftTwo.set(speed);
         rightOne.set(-speed);
         rightTwo.set(-speed);
+    }
+
+    public void driveToDistance() {
+        double speed = driveDistanceController.calculate(Robot.dist.getRange(Rev2mDistanceSensor.Unit.kInches));
+
+        leftOne.set(speed);
+        leftTwo.set(speed);
+        rightOne.set(-speed);
+        rightTwo.set(-speed);
+    }
+
+    public void turnToGyro() {
+        double speed = turnGyroController.calculate(Robot.gyro.getAngle());
+
+        leftOne.set(speed);
+        leftTwo.set(speed);
+        rightOne.set(speed);
+        rightTwo.set(speed);
+    }
+
+    public void ballSeek() {
+        double throttle = -driveBallController.calculate(Robot.camera.getValues()[2]);
+        double turn = -turnBallController.calculate(Robot.camera.getValues()[1]);
+
+        leftOne.set(turn - throttle);
+        leftTwo.set(turn - throttle);
+        rightOne.set(turn + throttle);
+        rightTwo.set(turn + throttle);
     }
 
     public void stop() {
@@ -139,6 +217,6 @@ public class Drivebase {
     public void dashboard() {
         SmartDashboard.putNumber("Left Position", leftPosition());
         SmartDashboard.putNumber("Right Position", rightPosition());
-        SmartDashboard.putData("PID", driveController);
+        SmartDashboard.putData("PID", driveEncoderController);
     }
 }
