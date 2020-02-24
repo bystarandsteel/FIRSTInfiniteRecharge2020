@@ -204,5 +204,9 @@ public class Robot extends TimedRobot {
         } else {
             base.arcadeDrive();
         }
+
+        if (driver.getAButtonReleased()) {
+            gyro.reset();
+        }
     }
 }
