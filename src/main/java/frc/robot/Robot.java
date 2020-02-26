@@ -25,6 +25,8 @@ public class Robot extends TimedRobot {
     public static BallHandler handler = new BallHandler(5,7, 12);
     public static Climber climber = new Climber(8, 11, 0);
 
+    //public static LedManipulator led = new LedManipulator(-1);
+
     public static boolean flipDrive = false;
 
     public static SendableChooser<Integer> chooser = new SendableChooser<>();
@@ -37,6 +39,8 @@ public class Robot extends TimedRobot {
         base.initialize();
         handler.initialize();
         climber.initialize();
+        gyro.reset();
+
 
         chooser.setDefaultOption("Disable Auto", 0);
         chooser.addOption("Score", 1);
@@ -53,7 +57,7 @@ public class Robot extends TimedRobot {
     @Override
     public void autonomousInit() {
         base.reset();
-        handler.reset();
+        gyro.reset();
     }
 
     @Override
@@ -61,12 +65,11 @@ public class Robot extends TimedRobot {
         switch (chooser.getSelected()) {
             case 1:
                 if (autoCounter == 0) {
-                    base.setSetpointEncoder(51);
+                    base.setSetpointEncoder(49);
                 }
                 if (!base.atSetpointEncoder()) {
                     base.driveToEncoder();
                 } else {
-                    base.stop();
                     if (autoCounter < 95) {
                         handler.spitOut();
                         autoCounter++;
@@ -76,14 +79,12 @@ public class Robot extends TimedRobot {
                         if (!base.atSetpointEncoder()) {
                             base.driveToEncoder();
                         } else {
-                            base.stop();
-                            handler.hoodIn();
+                            //handler.hoodIn();
                             base.setSetpointGyro(180);
                             if (!base.atSetpointGyro()) {
                                 base.turnToGyro();
                             } else {
                                 base.stop();
-                                base.ballSeek();
                             }
                         }
                     }
@@ -91,12 +92,11 @@ public class Robot extends TimedRobot {
                 break;
             case 2:
                 if (autoCounter == 0) {
-                    base.setSetpointEncoder(51);
+                    base.setSetpointEncoder(49);
                 }
                 if (!base.atSetpointEncoder()) {
                     base.driveToEncoder();
                 } else {
-                    base.stop();
                     if (autoCounter < 95 && autoCounter >= 0) {
                         handler.spitOut();
                         autoCounter++;
@@ -106,8 +106,7 @@ public class Robot extends TimedRobot {
                         if (!base.atSetpointEncoder()) {
                             base.driveToEncoder();
                         } else {
-                            base.stop();
-                            handler.hoodIn();
+                            //handler.hoodIn();
                             if (autoCounter > -1) {
                                 base.setSetpointGyro(270);
                             }
@@ -115,7 +114,6 @@ public class Robot extends TimedRobot {
                                 base.turnToGyro();
                                 autoCounter = -1;
                             } else {
-                                base.stop();
                                 if (autoCounter == -1) {
                                     base.reset();
                                 }
@@ -128,7 +126,6 @@ public class Robot extends TimedRobot {
                                         base.turnToGyro();
                                     } else {
                                         base.stop();
-                                        base.ballSeek();
                                     }
                                 }
                             }
@@ -147,7 +144,6 @@ public class Robot extends TimedRobot {
                         base.turnToGyro();
                     } else {
                         base.stop();
-                        base.ballSeek();
                     }
                 }
                 break;
@@ -162,7 +158,6 @@ public class Robot extends TimedRobot {
         handler.stop();
 
         base.reset();
-        handler.reset();
     }
 
     @Override
@@ -172,6 +167,7 @@ public class Robot extends TimedRobot {
         climber.run();
         camera.run();
         imu.run();
+        //led.run();
     }
 
     public void dashboard() {
@@ -199,14 +195,33 @@ public class Robot extends TimedRobot {
 
         if (driver.getTriggerAxis(right) > 0.5) {
             base.tankDrive();
-        } else if (driver.getAButton()) {
-            base.driveToEncoder();
         } else {
             base.arcadeDrive();
         }
 
         if (driver.getAButtonReleased()) {
             gyro.reset();
+        }
+
+        if (driver.getPOV() == 0) {
+            base.setSetpointGyro(0);
+        } else if (driver.getPOV() == 90) {
+            base.setSetpointGyro(90);
+        } else if (driver.getPOV() == 180) {
+            base.setSetpointGyro(180);
+        } else if (driver.getPOV() == 270) {
+            base.setSetpointGyro(270);
+        }
+
+        if (driver.getBButton()) {
+            base.turnToGyro();
+        }
+    }
+
+    public void IMUReset() {
+        if (operator.getStickButtonReleased(left)) {
+            imu = null;
+            imu = new IMU();
         }
     }
 }

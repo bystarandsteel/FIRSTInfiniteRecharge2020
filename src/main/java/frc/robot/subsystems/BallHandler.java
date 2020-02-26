@@ -10,34 +10,27 @@ import frc.robot.Robot;
 
 public class BallHandler {
 
-    private TalonSRX spinner, hood, intakeRaiser;
+    private TalonSRX spinner, hood, shelf;
 
     private boolean hoodIn = false;
 
-    private boolean intakeUp = true;
-
     private DigitalInput hoodSwitch = new DigitalInput(9);
 
-    public BallHandler(int spinnerID, int hoodID, int intakeRaiserID) {
+    private int shelfCounter = 0;
+
+    private boolean shelfMovingUp = false;
+    private boolean shelfMovingDown = false;
+
+    public BallHandler(int spinnerID, int hoodID, int shelfID) {
         spinner = new TalonSRX(spinnerID);
         hood = new TalonSRX(hoodID);
-        intakeRaiser = new TalonSRX(intakeRaiserID);
+        shelf = new TalonSRX(shelfID);
     }
 
     public void initialize() {
-        reset();
-
         spinner.setNeutralMode(NeutralMode.Brake);
         hood.setNeutralMode(NeutralMode.Brake);
-        intakeRaiser.setNeutralMode(NeutralMode.Coast);
-    }
-
-    public void reset() {
-        intakeRaiser.setSelectedSensorPosition(0);
-    }
-
-    public double intakeRaiserEncoder() {
-        return intakeRaiser.getSelectedSensorPosition();
+        shelf.setNeutralMode(NeutralMode.Brake);
     }
 
     public void releaseHood() {
@@ -65,12 +58,32 @@ public class BallHandler {
     public void stop() {
         spinner.set(ControlMode.PercentOutput, 0);
         hood.set(ControlMode.PercentOutput, 0);
-        intakeRaiser.set(ControlMode.PercentOutput, 0);
+        shelf.set(ControlMode.PercentOutput, 0);
     }
 
     public void dashboard() {
         SmartDashboard.putBoolean("Hood Switch", !hoodSwitch.get());
         SmartDashboard.putBoolean("Hood In", hoodIn);
+    }
+
+    public void cycleShelf() {
+        if (!shelfMovingDown && !shelfMovingUp) {
+            shelf.set(ControlMode.PercentOutput, 0);
+        } else if (shelfMovingDown && shelfCounter < 30) {
+            shelf.set(ControlMode.PercentOutput, 0.2);
+            shelfCounter++;
+        } else if (shelfMovingDown && shelfCounter == 30) {
+            shelf.set(ControlMode.PercentOutput, 0);
+            shelfCounter = -1;
+        } else if (shelfMovingUp && shelfCounter < 30) {
+            shelf.set(ControlMode.PercentOutput, -0.2);
+            shelfCounter++;
+        } else if (shelfMovingUp && shelfCounter == 30) {
+            shelf.set(ControlMode.PercentOutput, 0);
+            shelfCounter = -1;
+        } else {
+            shelf.set(ControlMode.PercentOutput, 0);
+        }
     }
 
     public void run() {
@@ -82,18 +95,6 @@ public class BallHandler {
             spinner.set(ControlMode.PercentOutput, -0.6);
         } else {
             spinner.set(ControlMode.PercentOutput, 0);
-        }
-
-        if (Robot.operator.getAButtonReleased()) {
-            intakeUp = !intakeUp;
-        }
-
-        if (intakeUp && intakeRaiserEncoder() > 200) {
-            intakeRaiser.set(ControlMode.PercentOutput, 0.25);
-        } else if (!intakeUp && intakeRaiserEncoder() < 1000) {
-            intakeRaiser.set(ControlMode.PercentOutput, -0.25);
-        } else {
-            intakeRaiser.set(ControlMode.PercentOutput, 0);
         }
 
         if (Robot.operator.getBButtonReleased()) {
@@ -113,5 +114,27 @@ public class BallHandler {
         } else if (!hoodIn) {
             hood.setNeutralMode(NeutralMode.Coast);
         }
+
+        /*if (Robot.operator.getAButtonReleased()) {
+            if (!shelfMovingUp && !shelfMovingDown) {
+                shelfMovingDown = true;
+            } else if (shelfMovingDown && shelfCounter == -1) {
+                shelfMovingDown = false;
+                shelfMovingUp = true;
+            } else if (shelfMovingUp && shelfCounter == -1) {
+                shelfMovingUp = false;
+                shelfMovingDown = true;
+            }
+        }*/
+
+        if (Robot.operator.getAButton()) {
+            shelf.set(ControlMode.PercentOutput, 0.25);
+        } else if (Robot.operator.getBackButton()) {
+            shelf.set(ControlMode.PercentOutput, -0.25);
+        } else {
+            shelf.set(ControlMode.PercentOutput, 0);
+        }
+
+        //cycleShelf();
     }
 }

@@ -15,7 +15,7 @@ public class Drivebase {
     private static final double driveI = 0.0;
     private static final double driveD = 0.0;
 
-    private static final double turnP = 0.01;
+    private static final double turnP = 0.05;
     private static final double turnI = 0.0;
     private static final double turnD = 0.0;
 
