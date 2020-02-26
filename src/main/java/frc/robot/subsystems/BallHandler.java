@@ -77,9 +77,9 @@ public class BallHandler {
         if (Robot.operator.getTriggerAxis(Robot.left) > 0.5) {
             spinner.set(ControlMode.PercentOutput, 0.8);
         } else if (Robot.operator.getBumper(Robot.left)) {
-            spinner.set(ControlMode.PercentOutput, 0.3);
+            spinner.set(ControlMode.PercentOutput, 0.6);
         } else if (Robot.operator.getTriggerAxis(Robot.right) > 0.5) {
-            spinner.set(ControlMode.PercentOutput, -0.8);
+            spinner.set(ControlMode.PercentOutput, -0.6);
         } else {
             spinner.set(ControlMode.PercentOutput, 0);
         }
