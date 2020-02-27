@@ -267,17 +267,6 @@
               "_title": "Angle"
             }
           },
-          "0,1": {
-            "size": [
-              1,
-              2
-            ],
-            "content": {
-              "_type": "PID Controller",
-              "_source0": "network_table:///SmartDashboard/PID",
-              "_title": "PID"
-            }
-          },
           "1,1": {
             "size": [
               1,

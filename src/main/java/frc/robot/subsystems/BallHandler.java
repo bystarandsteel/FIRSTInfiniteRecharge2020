@@ -55,6 +55,10 @@ public class BallHandler {
         }
     }
 
+    public void lowerShelf() {
+        shelf.set(ControlMode.PercentOutput, -0.25);
+    }
+
     public void stop() {
         spinner.set(ControlMode.PercentOutput, 0);
         hood.set(ControlMode.PercentOutput, 0);
@@ -64,26 +68,6 @@ public class BallHandler {
     public void dashboard() {
         SmartDashboard.putBoolean("Hood Switch", !hoodSwitch.get());
         SmartDashboard.putBoolean("Hood In", hoodIn);
-    }
-
-    public void cycleShelf() {
-        if (!shelfMovingDown && !shelfMovingUp) {
-            shelf.set(ControlMode.PercentOutput, 0);
-        } else if (shelfMovingDown && shelfCounter < 30) {
-            shelf.set(ControlMode.PercentOutput, 0.2);
-            shelfCounter++;
-        } else if (shelfMovingDown && shelfCounter == 30) {
-            shelf.set(ControlMode.PercentOutput, 0);
-            shelfCounter = -1;
-        } else if (shelfMovingUp && shelfCounter < 30) {
-            shelf.set(ControlMode.PercentOutput, -0.2);
-            shelfCounter++;
-        } else if (shelfMovingUp && shelfCounter == 30) {
-            shelf.set(ControlMode.PercentOutput, 0);
-            shelfCounter = -1;
-        } else {
-            shelf.set(ControlMode.PercentOutput, 0);
-        }
     }
 
     public void run() {
@@ -115,18 +99,6 @@ public class BallHandler {
             hood.setNeutralMode(NeutralMode.Coast);
         }
 
-        /*if (Robot.operator.getAButtonReleased()) {
-            if (!shelfMovingUp && !shelfMovingDown) {
-                shelfMovingDown = true;
-            } else if (shelfMovingDown && shelfCounter == -1) {
-                shelfMovingDown = false;
-                shelfMovingUp = true;
-            } else if (shelfMovingUp && shelfCounter == -1) {
-                shelfMovingUp = false;
-                shelfMovingDown = true;
-            }
-        }*/
-
         if (Robot.operator.getAButton()) {
             shelf.set(ControlMode.PercentOutput, 0.25);
         } else if (Robot.operator.getBackButton()) {
@@ -134,7 +106,5 @@ public class BallHandler {
         } else {
             shelf.set(ControlMode.PercentOutput, 0);
         }
-
-        //cycleShelf();
     }
 }

@@ -15,7 +15,7 @@ public class Robot extends TimedRobot {
     public static final GenericHID.Hand left = GenericHID.Hand.kLeft;
     public static final GenericHID.Hand right = GenericHID.Hand.kRight;
 
-    public static Limelight camera = new Limelight(0);
+    public static Limelight camera = new Limelight(2);
     public static DistanceSensor dist = new DistanceSensor(Rev2mDistanceSensor.Port.kOnboard);
     public static ColorSensor color = new ColorSensor(I2C.Port.kMXP);
     public static NavX gyro = new NavX();
@@ -44,8 +44,7 @@ public class Robot extends TimedRobot {
 
         chooser.setDefaultOption("Disable Auto", 0);
         chooser.addOption("Score", 1);
-        chooser.addOption("Score and Side", 2);
-        chooser.addOption("Back Up", 3);
+        chooser.addOption("Back Up", 2);
         SmartDashboard.putData("Auto Mode", chooser);
     }
 
@@ -58,6 +57,8 @@ public class Robot extends TimedRobot {
     public void autonomousInit() {
         base.reset();
         gyro.reset();
+
+        base.setRampAuto();
     }
 
     @Override
@@ -65,86 +66,48 @@ public class Robot extends TimedRobot {
         switch (chooser.getSelected()) {
             case 1:
                 if (autoCounter == 0) {
-                    base.setSetpointEncoder(49);
+                    base.setSetpointDistance(5);
                 }
-                if (!base.atSetpointEncoder()) {
-                    base.driveToEncoder();
+                if (!base.atSetpointDistance() && autoCounter == 0) {
+                    base.driveToDistance();
                 } else {
-                    if (autoCounter < 95) {
+                    if (autoCounter < 20 && autoCounter > -1) {
+                        handler.lowerShelf();
+                        autoCounter++;
+                    } else if (autoCounter < 115 && autoCounter > -1) {
                         handler.spitOut();
                         autoCounter++;
                     } else {
                         handler.stop();
-                        base.setSetpointEncoder(20);
-                        if (!base.atSetpointEncoder()) {
-                            base.driveToEncoder();
+                        base.setSetpointDistance(30);
+                        if (!base.atSetpointDistance()) {
+                            base.driveToDistance();
                         } else {
-                            //handler.hoodIn();
-                            base.setSetpointGyro(180);
+                            base.setSetpointGyro(-90);
                             if (!base.atSetpointGyro()) {
                                 base.turnToGyro();
+                                base.reset();
+                                autoCounter = -1;
                             } else {
                                 base.stop();
+                                base.setSetpointEncoder(35);
+                                autoCounter--;
+                                if (!base.atSetpointEncoder() && autoCounter < -35) {
+                                    base.driveToEncoder();
+                                } else {
+                                    base.stop();
+                                }
                             }
                         }
                     }
                 }
                 break;
             case 2:
-                if (autoCounter == 0) {
-                    base.setSetpointEncoder(49);
-                }
-                if (!base.atSetpointEncoder()) {
-                    base.driveToEncoder();
-                } else {
-                    if (autoCounter < 95 && autoCounter >= 0) {
-                        handler.spitOut();
-                        autoCounter++;
-                    } else {
-                        handler.stop();
-                        base.setSetpointEncoder(35);
-                        if (!base.atSetpointEncoder()) {
-                            base.driveToEncoder();
-                        } else {
-                            //handler.hoodIn();
-                            if (autoCounter > -1) {
-                                base.setSetpointGyro(270);
-                            }
-                            if (!base.atSetpointGyro()) {
-                                base.turnToGyro();
-                                autoCounter = -1;
-                            } else {
-                                if (autoCounter == -1) {
-                                    base.reset();
-                                }
-                                if (!base.atSetpointEncoder()) {
-                                    base.driveToEncoder();
-                                    autoCounter--;
-                                } else {
-                                    base.setSetpointGyro(180);
-                                    if (!base.atSetpointGyro()) {
-                                        base.turnToGyro();
-                                    } else {
-                                        base.stop();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                break;
-            case 3:
                 base.setSetpointEncoder(-5);
                 if (!base.atSetpointEncoder()) {
                     base.driveToEncoder();
                 } else {
                     base.stop();
-                    base.setSetpointGyro(180);
-                    if (!base.atSetpointGyro()) {
-                        base.turnToGyro();
-                    } else {
-                        base.stop();
-                    }
                 }
                 break;
             default:
@@ -157,6 +120,8 @@ public class Robot extends TimedRobot {
         base.stop();
         handler.stop();
 
+        base.setRampTeleop();
+
         base.reset();
     }
 
@@ -167,6 +132,7 @@ public class Robot extends TimedRobot {
         climber.run();
         camera.run();
         imu.run();
+        IMUReset();
         //led.run();
     }
 
@@ -201,20 +167,6 @@ public class Robot extends TimedRobot {
 
         if (driver.getAButtonReleased()) {
             gyro.reset();
-        }
-
-        if (driver.getPOV() == 0) {
-            base.setSetpointGyro(0);
-        } else if (driver.getPOV() == 90) {
-            base.setSetpointGyro(90);
-        } else if (driver.getPOV() == 180) {
-            base.setSetpointGyro(180);
-        } else if (driver.getPOV() == 270) {
-            base.setSetpointGyro(270);
-        }
-
-        if (driver.getBButton()) {
-            base.turnToGyro();
         }
     }
 

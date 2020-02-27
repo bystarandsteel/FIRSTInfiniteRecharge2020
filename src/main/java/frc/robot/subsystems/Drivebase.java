@@ -15,12 +15,12 @@ public class Drivebase {
     private static final double driveI = 0.0;
     private static final double driveD = 0.0;
 
-    private static final double turnP = 0.05;
+    private static final double turnP = 0.006;
     private static final double turnI = 0.0;
     private static final double turnD = 0.0;
 
     private PIDController driveEncoderController = new PIDController(driveP, driveI, driveD);
-    private PIDController driveDistanceController = new PIDController(driveP, driveI, driveD);
+    private PIDController driveDistanceController = new PIDController(driveP / 2, driveI, driveD);
 
     private PIDController turnGyroController = new PIDController(turnP, turnI, turnD);
 
@@ -42,11 +42,6 @@ public class Drivebase {
         rightOne.setIdleMode(CANSparkMax.IdleMode.kBrake);
         rightTwo.setIdleMode(CANSparkMax.IdleMode.kBrake);
 
-        leftOne.setOpenLoopRampRate(0.7);
-        leftTwo.setOpenLoopRampRate(0.7);
-        rightOne.setOpenLoopRampRate(0.7);
-        rightTwo.setOpenLoopRampRate(0.7);
-
         driveEncoderController.setTolerance(1.5);
         driveEncoderController.setSetpoint(0);
 
@@ -61,6 +56,20 @@ public class Drivebase {
 
         turnBallController.setTolerance(1);
         turnBallController.setSetpoint(0);
+    }
+
+    public void setRampTeleop() {
+        leftOne.setOpenLoopRampRate(0.7);
+        leftTwo.setOpenLoopRampRate(0.7);
+        rightOne.setOpenLoopRampRate(0.7);
+        rightTwo.setOpenLoopRampRate(0.7);
+    }
+
+    public void setRampAuto() {
+        leftOne.setOpenLoopRampRate(2);
+        leftTwo.setOpenLoopRampRate(2);
+        rightOne.setOpenLoopRampRate(2);
+        rightTwo.setOpenLoopRampRate(2);
     }
 
     public void reset() {
@@ -143,7 +152,7 @@ public class Drivebase {
     }
 
     public boolean atSetpointDistance() {
-        if (Math.abs(getSetpointDistance() - Robot.dist.getRange(Rev2mDistanceSensor.Unit.kInches)) < 0.25) {
+        if (Math.abs(getSetpointDistance() - Robot.dist.getRange(Rev2mDistanceSensor.Unit.kInches)) < 2) {
             return true;
         } else {
             return false;
@@ -181,11 +190,14 @@ public class Drivebase {
 
     public void driveToDistance() {
         double speed = driveDistanceController.calculate(Robot.dist.getRange(Rev2mDistanceSensor.Unit.kInches));
+        if (Robot.dist.getRange(Rev2mDistanceSensor.Unit.kInches) == -1) {
+            speed = -0.35;
+        }
 
-        leftOne.set(speed);
-        leftTwo.set(speed);
-        rightOne.set(-speed);
-        rightTwo.set(-speed);
+        leftOne.set(-speed);
+        leftTwo.set(-speed);
+        rightOne.set(speed);
+        rightTwo.set(speed);
     }
 
     public void turnToGyro() {
@@ -217,6 +229,5 @@ public class Drivebase {
     public void dashboard() {
         SmartDashboard.putNumber("Left Position", leftPosition());
         SmartDashboard.putNumber("Right Position", rightPosition());
-        SmartDashboard.putData("PID", driveEncoderController);
     }
 }
