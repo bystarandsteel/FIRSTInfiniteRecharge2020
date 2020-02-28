@@ -83,17 +83,17 @@ public class Robot extends TimedRobot {
                         if (!base.atSetpointDistance()) {
                             base.driveToDistance();
                         } else {
-                            base.setSetpointGyro(-90);
+                            base.setSetpointGyro(90);
                             if (!base.atSetpointGyro()) {
                                 base.turnToGyro();
                                 base.reset();
                                 autoCounter = -1;
                             } else {
                                 base.stop();
-                                base.setSetpointEncoder(35);
-                                autoCounter--;
-                                if (!base.atSetpointEncoder() && autoCounter < -35) {
+                                base.setSetpointEncoder(15);
+                                if (autoCounter > -30) {
                                     base.driveToEncoder();
+                                    autoCounter--;
                                 } else {
                                     base.stop();
                                 }
