@@ -10,6 +10,7 @@ public class LedManipulator {
     private AddressableLED led;
 
     public LedManipulator(int port) {
+        setColor(0, 100, 0);
         led = new AddressableLED(port);
         led.setData(ledBuffer);
         led.start();

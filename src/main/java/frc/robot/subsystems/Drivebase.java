@@ -104,6 +104,11 @@ public class Drivebase {
             throttle *= 0.2;
         }
 
+        if (Robot.driver.getBumper(Robot.left) || Robot.driver.getBumper(Robot.right)) {
+            turn *= 0.7;
+            throttle *= 0.7;
+        }
+
         if (Robot.flipDrive) {
             leftOne.set(turn + throttle);
             leftTwo.set(turn + throttle);
@@ -160,7 +165,7 @@ public class Drivebase {
     }
 
     public boolean atSetpointGyro() {
-        if (Math.abs(getSetpointGyro() - Robot.gyro.getAngle()) < 2) {
+        if (Math.abs(getSetpointGyro() - Robot.gyro.getAngle()) < 5) {
             return true;
         } else {
             return false;

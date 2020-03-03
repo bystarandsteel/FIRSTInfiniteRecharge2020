@@ -25,13 +25,20 @@ public class Robot extends TimedRobot {
     public static BallHandler handler = new BallHandler(5,7, 12);
     public static Climber climber = new Climber(8, 11, 0);
 
-    //public static LedManipulator led = new LedManipulator(-1);
+    //public static LedManipulator led1 = new LedManipulator(1);
+    //public static LedManipulator led2 = new LedManipulator(2);
 
     public static boolean flipDrive = false;
 
     public static SendableChooser<Integer> chooser = new SendableChooser<>();
 
     public static int autoCounter = 0;
+
+    public static boolean hasCompleted = false;
+
+    public static boolean hasCompleted2 = false;
+
+    public static int delayCounter = 0;
 
     @Override
     public void robotInit() {
@@ -43,14 +50,20 @@ public class Robot extends TimedRobot {
 
 
         chooser.setDefaultOption("Disable Auto", 0);
-        chooser.addOption("Score", 1);
-        chooser.addOption("Back Up", 2);
+        chooser.addOption("Score w/ Delay", 1);
+        chooser.addOption("Score", 2);
+        chooser.addOption("Back Up", 3);
         SmartDashboard.putData("Auto Mode", chooser);
+
+        //led1.setColor(0, 100, 0);
+        //led2.setColor(0, 100, 0);
     }
 
     @Override
     public void robotPeriodic() {
         dashboard();
+        //led1.run();
+        //led2.run();
     }
 
     @Override
@@ -65,33 +78,39 @@ public class Robot extends TimedRobot {
     public void autonomousPeriodic() {
         switch (chooser.getSelected()) {
             case 1:
+                if (delayCounter < 400) {
+                    delayCounter++;
+                    return;
+                }
                 if (autoCounter == 0) {
-                    base.setSetpointDistance(5);
+                    base.setSetpointDistance(6);
                 }
                 if (!base.atSetpointDistance() && autoCounter == 0) {
                     base.driveToDistance();
                 } else {
-                    if (autoCounter < 20 && autoCounter > -1) {
+                    if (autoCounter < 40 && autoCounter > -1) {
                         handler.lowerShelf();
                         autoCounter++;
-                    } else if (autoCounter < 115 && autoCounter > -1) {
+                    } else if (autoCounter < 135 && autoCounter > -1) {
                         handler.spitOut();
                         autoCounter++;
                     } else {
                         handler.stop();
                         base.setSetpointDistance(30);
-                        if (!base.atSetpointDistance()) {
+                        if (!base.atSetpointDistance() && !hasCompleted) {
                             base.driveToDistance();
                         } else {
+                            hasCompleted = true;
                             base.setSetpointGyro(90);
-                            if (!base.atSetpointGyro()) {
+                            if (!base.atSetpointGyro() && !hasCompleted2) {
                                 base.turnToGyro();
                                 base.reset();
                                 autoCounter = -1;
                             } else {
+                                hasCompleted2 = true;
                                 base.stop();
                                 base.setSetpointEncoder(15);
-                                if (autoCounter > -30) {
+                                if (autoCounter > -65) {
                                     base.driveToEncoder();
                                     autoCounter--;
                                 } else {
@@ -103,7 +122,47 @@ public class Robot extends TimedRobot {
                 }
                 break;
             case 2:
-                base.setSetpointEncoder(-5);
+                if (autoCounter == 0) {
+                    base.setSetpointDistance(6);
+                }
+                if (!base.atSetpointDistance() && autoCounter == 0) {
+                    base.driveToDistance();
+                } else {
+                    if (autoCounter < 40 && autoCounter > -1) {
+                        handler.lowerShelf();
+                        autoCounter++;
+                    } else if (autoCounter < 135 && autoCounter > -1) {
+                        handler.spitOut();
+                        autoCounter++;
+                    } else {
+                        handler.stop();
+                        base.setSetpointDistance(30);
+                        if (!base.atSetpointDistance() && !hasCompleted) {
+                            base.driveToDistance();
+                        } else {
+                            hasCompleted = true;
+                            base.setSetpointGyro(90);
+                            if (!base.atSetpointGyro() && !hasCompleted2) {
+                                base.turnToGyro();
+                                base.reset();
+                                autoCounter = -1;
+                            } else {
+                                hasCompleted2 = true;
+                                base.stop();
+                                base.setSetpointEncoder(15);
+                                if (autoCounter > -65) {
+                                    base.driveToEncoder();
+                                    autoCounter--;
+                                } else {
+                                    base.stop();
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+            case 3:
+                base.setSetpointEncoder(-35);
                 if (!base.atSetpointEncoder()) {
                     base.driveToEncoder();
                 } else {
@@ -123,6 +182,8 @@ public class Robot extends TimedRobot {
         base.setRampTeleop();
 
         base.reset();
+
+        base.setSetpointDistance(6);
     }
 
     @Override
@@ -167,6 +228,10 @@ public class Robot extends TimedRobot {
 
         if (driver.getAButtonReleased()) {
             gyro.reset();
+        }
+
+        if (driver.getBButton()) {
+            base.driveToDistance();
         }
     }
 

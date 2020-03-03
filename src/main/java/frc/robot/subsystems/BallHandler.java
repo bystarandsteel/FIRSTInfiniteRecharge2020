@@ -38,7 +38,7 @@ public class BallHandler {
     }
 
     public void spitOut() {
-        spinner.set(ControlMode.PercentOutput, 0.75);
+        spinner.set(ControlMode.PercentOutput, 0.85);
     }
 
     public void hoodIn() {

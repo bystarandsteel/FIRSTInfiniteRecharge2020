@@ -51,9 +51,9 @@ public class Climber {
             rachet.setPosition(0.1);
         }
 
-        if (Robot.operator.getPOV() == 0) {
+        if (Robot.operator.getY(Robot.left) < -0.5) {
             climber.set(ControlMode.PercentOutput, -0.4);
-        } else if (Robot.operator.getPOV() == 180) {
+        } else if (Robot.operator.getY(Robot.left) > 0.5) {
             climber.set(ControlMode.PercentOutput, 0.4);
         } else {
             climber.set(ControlMode.PercentOutput, 0);
